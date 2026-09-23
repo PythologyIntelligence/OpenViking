@@ -1,0 +1,24 @@
+name: Pythology Security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - 'security/**'
+      - automation/upstream-sync
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Check Pythology security invariants
+        run: python scripts/check-pythology-security-invariants.py
+      - name: Check patch whitespace
+        run: git diff --check
