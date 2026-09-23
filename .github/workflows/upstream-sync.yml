@@ -1,0 +1,67 @@
+name: Pythology Upstream Sync
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: pythology-openviking-upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Pythology main
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "pythology-upstream-sync"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch upstream
+        run: |
+          git remote add upstream https://github.com/volcengine/OpenViking.git
+          git fetch --no-tags upstream main
+          git fetch --no-tags origin main automation/upstream-sync || true
+
+      - name: Stage upstream merge
+        run: |
+          git checkout -B automation/upstream-sync origin/main
+          if ! git merge --no-edit upstream/main; then
+            git merge --abort || true
+            echo "::error::Upstream merge conflicted. Failing closed for manual review."
+            exit 1
+          fi
+
+      - name: Push review branch
+        run: |
+          if git diff --quiet origin/main...HEAD; then
+            echo "No upstream changes to review."
+            exit 0
+          fi
+          git push --force-with-lease origin automation/upstream-sync
+
+      - name: Create or update review PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet origin/main...HEAD; then
+            exit 0
+          fi
+          existing="$(gh pr list --base main --head automation/upstream-sync --state open --json number --jq '.[0].number // empty')"
+          body="Automated staging of upstream volcengine/OpenViking:main. DO NOT AUTO-MERGE. Review Pythology security invariants, licensing, auth, memory mutation, provider egress, VikingBot/sandbox/plugin surfaces and deployment defaults."
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "chore: review OpenViking upstream sync" --body "$body"
+          else
+            gh pr create --base main --head automation/upstream-sync --title "chore: review OpenViking upstream sync" --body "$body"
+          fi

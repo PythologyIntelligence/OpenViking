@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-WITH_BOT="${OPENVIKING_WITH_BOT:-1}"
+WITH_BOT="${OPENVIKING_WITH_BOT:-0}"
 HEALTH_MAX_ATTEMPTS="${OPENVIKING_HEALTH_MAX_ATTEMPTS:-120}"
 CONFIG_FILE="${OPENVIKING_CONFIG_FILE:-/app/.openviking/ov.conf}"
 PENDING_HEALTH_SCRIPT="/usr/local/bin/openviking-pending-health"
