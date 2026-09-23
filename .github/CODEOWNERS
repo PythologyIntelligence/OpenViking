@@ -1,0 +1,16 @@
+# Pythology fork ownership
+* @PythologyIntelligence
+
+/.github/ @PythologyIntelligence
+/PYTHOLOGY_SECURITY.md @PythologyIntelligence
+/scripts/check-pythology-security-invariants.py @PythologyIntelligence
+/deploy/ @PythologyIntelligence
+/openviking/server/ @PythologyIntelligence
+/openviking/storage/ @PythologyIntelligence
+/openviking/telemetry/ @PythologyIntelligence
+/openviking/metrics/ @PythologyIntelligence
+/openviking_cli/ @PythologyIntelligence
+/bot/ @PythologyIntelligence
+/examples/hermes-plugin/ @PythologyIntelligence
+/examples/openclaw-plugin/ @PythologyIntelligence
+/sdk/ @PythologyIntelligence
